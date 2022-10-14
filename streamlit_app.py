@@ -1,34 +1,38 @@
 import streamlit as st
 import utils
-import admin_utils
+
+import json
+import requests
 
 # background image
 utils.add_bg_from_url()
 
-# initilaize empty app variable
-#app = None
+rest_api_url = f"https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword"
 
-# Streamlit widgets to let a user create a new post
+# Streamlit widgets for input text
 input_email = st.text_input("Emailaddress")
-input_username = st.text_input("Username")
 input_password = st.text_input("Password", type="password")
 input_submit_button = st.button("Submit")
 
-if input_email and input_username and input_submit_button:
-    # initialize app
-    try:
-        app = admin_utils.firebase_admin_app()
-    except:
-        st.write("already connected with app")
 
-    new_user = admin_utils.create_user(email=input_email, 
-                                       username=input_username,
-                                        password=input_password)
+def sign_in_with_email_and_password(email: str, password: str, return_secure_token: bool = True):
+    # https://betterprogramming.pub/user-management-with-firebase-and-python-749a7a87b2b6
 
-    st.write(f"new user created")
-    st.write(f"id: {new_user.uid}")
-    st.write(f"tokens valid after timestamp: {new_user.tokens_valid_after_timestamp}" )
+    payload = json.dumps({
+        "email": email,
+        "password": password,
+        "returnSecureToken": return_secure_token
+    })
 
-    new_user_metadata = new_user.user_metadata
-    st.write(f"created on : {new_user_metadata.creation_timestamp}")
+    r = requests.post(rest_api_url,
+                      params={"key": st.secrets["firebase_web_api_key"]},
+                      data=payload)
 
+    return r.json()
+
+
+if input_email and input_password and input_submit_button:
+    token = sign_in_with_email_and_password(email=input_email,
+                                            password=input_password)
+
+    st.write(token)
