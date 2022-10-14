@@ -6,7 +6,7 @@ import admin_utils
 utils.add_bg_from_url()
 
 # initilaize empty app variable
-app = None
+#app = None
 
 # Streamlit widgets to let a user create a new post
 input_email = st.text_input("Emailaddress")
@@ -16,8 +16,10 @@ input_submit_button = st.button("Submit")
 
 if input_email and input_username and input_submit_button:
     # initialize app
-    if app == None:
+    try:
         app = admin_utils.firebase_admin_app()
+    except:
+        st.write("already connected with app")
 
     new_user = admin_utils.create_user(email=input_email, 
                                        username=input_username,
