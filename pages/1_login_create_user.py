@@ -2,7 +2,6 @@ import streamlit as st
 import json
 import requests
 
-
 ###############
 ## functions ## 
 ###############
@@ -28,8 +27,10 @@ def sign_in_with_email_and_password(email: str, password: str, return_secure_tok
 ## Streamlit ##
 ###############
 
+# background image
+utils.add_bg_from_url()
 st.set_page_config(page_title="Login")
-st.markdown("#KFD Login")
+st.markdown("# KFD Login")
 st.sidebar.header("KFD Login")
 
 # Streamlit widgets for input text
@@ -50,4 +51,5 @@ if input_email and input_password and input_submit_button:
     placeholder_input_password.empty()
     placeholder_button.empty()
 
+    st.write(f"Welcome {token['displayName']}")
     st.write(token)
