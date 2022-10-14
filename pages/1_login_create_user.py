@@ -44,7 +44,7 @@ placeholder_button = st.empty()
 
 input_email = placeholder_input_email.text_input("Emailaddress")
 input_password = placeholder_input_password.text_input("Password", type="password")
-input_submit_button = st.button("Submit")
+input_submit_button = placeholder_button.button("Submit")
 
 if input_email and input_password and input_submit_button:
     token = sign_in_with_email_and_password(email=input_email,
@@ -54,5 +54,5 @@ if input_email and input_password and input_submit_button:
     placeholder_input_password.empty()
     placeholder_button.empty()
 
-    st.write(f"Welcome {token['displayName']}")
+    st.write(f"### Welcome {token['displayName']}")
     st.write(token)
