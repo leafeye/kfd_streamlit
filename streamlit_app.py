@@ -1,41 +1,27 @@
 import streamlit as st
-import json
-from google.cloud import firestore
-from google.oauth2 import service_account
-
-from helper_functions import add_bg_from_url
+import utils
+import admin_utils
 
 # background image
-add_bg_from_url()
-
-# Authenticate to Firestore with the JSON account key.
-# from https://blog.streamlit.io/streamlit-firestore-continued/
-key_dict = json.loads(st.secrets["textkey"])
-creds = service_account.Credentials.from_service_account_info(key_dict)
-db = firestore.Client(credentials=creds, project="kfd-poc")
-
+utils.add_bg_from_url()
+#admin_utils.firebase_admin_app()
 
 # Streamlit widgets to let a user create a new post
-naam = st.text_input("Naam")
-jaar = st.text_input("Jaar")
-submit = st.button("Submit new post")
+input_email = st.text_input("Emailaddress")
+input_username = st.text_input("Username")
+input_password = st.text_input("Password", type="password")
+input_submit_button = st.button("Submit")
 
-# Once the user has submitted, upload it to the database
-if naam and jaar and submit:
-	doc_ref = db.collection("users").document(naam)
-	doc_ref.set({
-		"first": naam,
-		"born": jaar
-	})
+if input_email and input_username and input_submit_button:
 
+    new_user = admin_utils.create_user(email=input_email, 
+                                       username=input_username,
+                                        password=input_password)
 
-# And then render each user, using some light Markdown
-users_ref = db.collection("users")
-for doc in users_ref.stream():
-	user = doc.to_dict()
-	naam = user["first"]
-	jaar = user["born"]
+    st.write(f"new user created")
+    st.write(f"id: {new_user.uid}")
+    st.write(f"tokens valid after timestamp: {new_user.tokens_valid_after_timestamp}" )
 
-	st.subheader(f"User: {naam}")
-	st.write(f"jaar: {jaar}")
+    new_user_metadata = new_user.user_metadata
+    st.write(f"created on : {new_user_metadata.creation_timestamp}")
 
